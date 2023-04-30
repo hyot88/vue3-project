@@ -20,28 +20,10 @@
       @delete-todo="deleteTodo"
     />
     <hr />
-    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li v-if="currentPage !== 1" class="page-item">
-          <a style="cursor: pointer" class="page-link" @click="getTodos(currentPage - 1)">
-            Previous
-          </a>
-        </li>
-        <li
-          v-for="page in numberOfPages"
-          :key="page"
-          class="page-item"
-          :class="currentPage === page ? 'active' : ''"
-        >
-          <a style="cursor: pointer" class="page-link" @click="getTodos(page)">{{ page }}</a>
-        </li>
-        <li v-if="numberOfPages !== currentPage" class="page-item">
-          <a style="cursor: pointer" class="page-link" @click="getTodos(currentPage + 1)">
-            Next
-          </a>
-        </li>
-      </ul>
-    </nav>
+    <TodoPage
+      :pageInfo="filteredPage"
+      @get-todo="getTodos"
+    />
   </div>
 </template>
 
@@ -49,12 +31,14 @@
 import { ref, computed } from 'vue';
 import TodoSimpleForm from './components/TodoSimpleForm.vue';
 import TodoList from './components/TodoList.vue'
+import TodoPage from './components/TodoPage.vue'
 import axios from 'axios';
 
 export default{
   components: {
     TodoSimpleForm,
     TodoList,
+    TodoPage,
   },
   setup() {
     const todos = ref([]);
@@ -136,6 +120,13 @@ export default{
       return todos.value; 
     });
 
+    const filteredPage = computed(() => {
+      return {
+        currentPage,
+        numberOfPages,
+      }
+    });
+
     return {
       todos,
       addTodo,
@@ -148,6 +139,7 @@ export default{
       numberOfPages,
       currentPage,
       getTodos,
+      filteredPage,
     };
   }
 }
