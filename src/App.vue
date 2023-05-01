@@ -155,6 +155,7 @@ export default{
       currentPage,
       getTodos,
       filteredPage,
+      searchTodo,
     };
   }
 }
