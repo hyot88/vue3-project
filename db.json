@@ -11,21 +11,6 @@
       "id": 12
     },
     {
-      "subject": "123123",
-      "completed": false,
-      "id": 14
-    },
-    {
-      "subject": "123123",
-      "completed": false,
-      "id": 15
-    },
-    {
-      "subject": "123123",
-      "completed": false,
-      "id": 16
-    },
-    {
       "subject": "1234",
       "completed": false,
       "id": 17
@@ -61,24 +46,9 @@
       "id": 23
     },
     {
-      "subject": "678",
+      "subject": "test",
       "completed": false,
       "id": 24
-    },
-    {
-      "subject": "678",
-      "completed": false,
-      "id": 25
-    },
-    {
-      "subject": "678678",
-      "completed": false,
-      "id": 26
-    },
-    {
-      "subject": "6786",
-      "completed": false,
-      "id": 27
     }
   ]
 }

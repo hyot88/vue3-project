@@ -6,16 +6,17 @@
       type="text"
       v-model="searchText"
       placeholder="Search"
+      @keyup.enter="searchTodo"
     >
     <hr />
     <TodoSimpleForm @add-todo="addTodo" />
     <div style="color: red">{{ error }}</div>
     
-    <div v-if="!filteredTodos.length">
+    <div v-if="!todos.length">
       Thers is nothing to display
     </div>
     <TodoList
-      :todos="filteredTodos"
+      :todos="todos"
       @toggle-todo="toggleTodo"
       @delete-todo="deleteTodo"
     />
@@ -28,7 +29,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import TodoSimpleForm from './components/TodoSimpleForm.vue';
 import TodoList from './components/TodoList.vue'
 import TodoPage from './components/TodoPage.vue'
@@ -46,6 +47,7 @@ export default{
     const numberOfTodos = ref(0);
     const limit = 5;
     const currentPage = ref(1);
+    const searchText = ref('');
     const numberOfPages = computed(() => {
       return Math.ceil(numberOfTodos.value / limit);
     });
@@ -58,7 +60,7 @@ export default{
     const getTodos = async (page = currentPage.value) => {
       currentPage.value = page;
       try {
-        const res = await axios.get(`http://localhost:3000/todos?_page=${page}&_limit=${limit}`);
+        const res = await axios.get(`http://localhost:3000/todos?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${page}&_limit=${limit}`);
         numberOfTodos.value = res.headers['x-total-count'];
         todos.value = res.data;
       } catch (err) {
@@ -77,6 +79,8 @@ export default{
           subject: todo.subject,
           completed: todo.completed,
         });
+        
+        getTodos(1);
       } catch (err) {
         console.log(err);
         error.value = 'Something went wrong.';
@@ -102,23 +106,34 @@ export default{
       const id = todos.value[index].id;
       try {
         await axios.delete('http://localhost:3000/todos/' + id);
-        todos.value.splice(index, 1);
+        getTodos(1);
       } catch (err) {
         console.log(err);
         error.value = 'Something went wrong.';
       }    
     };
 
-    const searchText = ref('');
-    const filteredTodos = computed(() => {
-      if (searchText.value) {
-        return todos.value.filter(todo => {
-          return todo.subject.includes(searchText.value);
-        });
-      }
+    let timeout = null;
+    const searchTodo = () => {
+      clearTimeout(timeout);
+      getTodos(1);
+    };
 
-      return todos.value; 
+    watch(searchText, () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        getTodos(1);
+      }, 1000);
     });
+    // const filteredTodos = computed(() => {
+    //   if (searchText.value) {
+    //     return todos.value.filter(todo => {
+    //       return todo.subject.includes(searchText.value);
+    //     });
+    //   }
+
+    //   return todos.value; 
+    // });
 
     const filteredPage = computed(() => {
       return {
@@ -134,7 +149,7 @@ export default{
       deleteTodo,
       toggleTodo,
       searchText,
-      filteredTodos,
+      // filteredTodos,
       error,
       numberOfPages,
       currentPage,
