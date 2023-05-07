@@ -1,5 +1,5 @@
 <template>
-  <h1>Todo Page</h1>
+  <h1 class="text-red">Todo Page</h1>
   <TodoForm :editing="true" />
 </template>
 

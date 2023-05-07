@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, getCurrentInstance } from 'vue';
 
 export default {
     props: {
@@ -33,7 +33,9 @@ export default {
             required: true
         }
     },
-    setup(props, {emit}) {
+    emits: ['get-todo'],
+    setup(props) {
+        const { emit } = getCurrentInstance();
         const getTodos = (page) => {
             emit('get-todo', page);
         };

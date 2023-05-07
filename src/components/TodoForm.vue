@@ -8,20 +8,11 @@
     >
     <div class="row">
         <div class="col-6">
-            <div class="form-group">
-                <label>Subject</label>
-                <input
-                    v-model="todo.subject"
-                    type="text"
-                    class="form-control"
-                >
-                <div
-                    v-if="subjectError"
-                    style="color: red"
-                >
-                    {{ subjectError }}
-                </div>
-            </div>
+            <Input
+                label="Subject"
+                v-model:subject="todo.subject"
+                :error="subjectError"
+            />
         </div>
         <div v-if="editing" class="col-6">
             <div class="form-group">
@@ -60,24 +51,28 @@
         Cancel
     </button>
   </form>
-    <Toast
-        v-if="showToast"
-        :message="toastMessage"
-        :type="toastAlertType"
-    />
+    <transition name="fade">
+        <Toast
+            v-if="showToast"
+            :message="toastMessage"
+            :type="toastAlertType"
+        />
+    </transition>
 </template>
 
 <script>
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
+import axios from '@/axios';
 import { ref, computed, onUnmounted } from 'vue'
 import _ from 'lodash'
 import Toast from '@/components/Toast.vue';
 import { useToast } from '@/composables/toast'
+import Input from '@/components/input.vue'
 
 export default {
     components: {
-        Toast
+        Toast,
+        Input,
     },
     props: {
         editing: {
@@ -106,7 +101,7 @@ export default {
         const getTodo = async () => {
             loading.value = true;
             try {
-                const res = await axios.get(`http://localhost:3000/todos/${todoId}`);
+                const res = await axios.get(`todos/${todoId}`);
                 todo.value = { ...res.data };
                 originalTodo.value = { ...res.data };
                 loading.value = false;
@@ -151,10 +146,10 @@ export default {
                 };
 
                 if (props.editing) {
-                    res = await axios.put(`http://localhost:3000/todos/${todoId}`, data);
+                    res = await axios.put(`todos/${todoId}`, data);
                     originalTodo.value = { ...res.data };
                 } else {
-                    res = await axios.post('http://localhost:3000/todos', data);
+                    res = await axios.post('todos', data);
                     todo.value.subject = '';
                     todo.value.body = '';
                 }
@@ -183,6 +178,21 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: all 0.5s ease;
+    }
 
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    .fade-enter-to,
+    .fade-leave-from {
+        opacity: 1;
+        transform: translateY(0px);
+    }
 </style>
